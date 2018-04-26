@@ -22,14 +22,14 @@ function on_status_complete(parser)
 end
 
 function on_header_field(parser, at, len)
-    header = unsafe_string(convert(Ptr{UInt8}, at), Int(len))
+    header = unsafe_wrap(String, at, Int(len))
     # set the current header
     headers["current_header"] = header
     return 0
 end
 
 function on_header_value(parser, at, len)
-    s = unsafe_string(convert(Ptr{UInt8}, at), Int(len))
+    s = unsafe_wrap(String, at, Int(len))
     # once we know we have the header value, that will be the value for current header
     headers[headers["current_header"]] = s
     # reset current_header
@@ -73,18 +73,18 @@ function on_chunk_complete(parser)
     return 0
 end
 
-c_message_begin_cb = cfunction(on_message_begin, HttpParser.HTTP_CB...)
-c_url_cb = cfunction(on_url, HttpParser.HTTP_DATA_CB...)
-c_status_complete_cb = cfunction(on_status_complete, HttpParser.HTTP_CB...)
-c_header_field_cb = cfunction(on_header_field, HttpParser.HTTP_DATA_CB...)
-c_header_value_cb = cfunction(on_header_value, HttpParser.HTTP_DATA_CB...)
-c_headers_complete_cb = cfunction(on_headers_complete, HttpParser.HTTP_CB...)
-c_body_cb = cfunction(on_body, HttpParser.HTTP_DATA_CB...)
-c_message_complete_cb = cfunction(on_message_complete, HttpParser.HTTP_CB...)
-c_body_cb = cfunction(on_body, HttpParser.HTTP_DATA_CB...)
-c_message_complete_cb = cfunction(on_message_complete, HttpParser.HTTP_CB...)
-c_chunk_header_cb = cfunction(on_chunk_header, HttpParser.HTTP_CB...)
-c_chunk_complete_cb = cfunction(on_chunk_complete, HttpParser.HTTP_CB...)
+c_message_begin_cb = @cfunction(on_message_begin, (HttpParser.HTTP_CB...,))
+c_url_cb = @cfunction(on_url, HttpParser.HTTP_DATA_CB...)
+c_status_complete_cb = @cfunction(on_status_complete, (HttpParser.HTTP_CB...,))
+c_header_field_cb = @cfunction(on_header_field, (HttpParser.HTTP_DATA_CB...,))
+c_header_value_cb = @cfunction(on_header_value, (HttpParser.HTTP_DATA_CB...,))
+c_headers_complete_cb = @cfunction(on_headers_complete, (HttpParser.HTTP_CB...,))
+c_body_cb = @cfunction(on_body, (HttpParser.HTTP_DATA_CB...,))
+c_message_complete_cb = @cfunction(on_message_complete, (HttpParser.HTTP_CB...,))
+c_body_cb = @cfunction(on_body, (HttpParser.HTTP_DATA_CB...,))
+c_message_complete_cb = @cfunction(on_message_complete, (HttpParser.HTTP_CB...,))
+c_chunk_header_cb = @cfunction(on_chunk_header, (HttpParser.HTTP_CB...,))
+c_chunk_complete_cb = @cfunction(on_chunk_complete, (HttpParser.HTTP_CB...,))
 
 function parse(bytes)
     # reset request

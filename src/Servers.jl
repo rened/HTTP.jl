@@ -314,7 +314,7 @@ function listen(f::Function,
                 @async try
                     handle_connection(f, io; kw...)
                 catch e
-                    @error "Error:   $io" e catch_stacktrace()
+                    @error "Error:   $io" e stacktrace(catch_backtrace())
                 finally
                     close(io)
                     @info "Closed:  $io"
@@ -425,7 +425,7 @@ function handle_transaction(f::Function, t::Transaction;
         if isioerror(e)
             @warn e
         else
-            @error e catch_stacktrace()
+            @error e stacktrace(catch_backtrace())
         end
         close(t)
     end
@@ -449,7 +449,7 @@ function handle_stream(f::Function, http::Stream)
         end
     catch e
         if isopen(http) && !iswritable(http)
-            @error e catch_stacktrace()
+            @error e stacktrace(catch_backtrace())
             http.message.response.status = 500
             startwrite(http)
             write(http, sprint(showerror, e))
