@@ -21,7 +21,7 @@ Get a `Vector{UInt8}`, a vector of bytes of a string.
 """
 function bytes end
 if VERSION >= v"0.7.0-DEV.2008"
-    bytes(s::ReinterpretArray{UInt8}) = unsafe_wrap(Array, pointer(s), length(s))
+    bytes(s::Base.ReinterpretArray{UInt8}) = unsafe_wrap(Array, pointer(s), length(s))
 end
 bytes(s::SubArray{UInt8}) = unsafe_wrap(Array, pointer(s), length(s))
 if !isdefined(Base, :CodeUnits)
